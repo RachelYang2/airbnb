@@ -1,0 +1,53 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background: url('images/background.png') no-repeat;
+  background-position-y: bottom;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  .button-wrapper {
+    text-align: right;
+    margin: 2vw;
+    a {
+      margin: 3vw;
+    }
+  }
+
+  .filters {
+    margin-top: 25vh;
+  }
+
+  #components-dropdown-demo-dropdown-button .ant-dropdown-button {
+    margin: 0 8px 8px 0;
+  }
+}
+
+#App-link {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#components-form-demo-normal-login .login-form {
+  max-width: 300px;
+}
+#components-form-demo-normal-login .login-form-forgot {
+  float: right;
+}
+#components-form-demo-normal-login .login-form-button {
+  width: 100%;
+}
+
+.content {
+  text-align: left;
+  padding: 4vw;
+}

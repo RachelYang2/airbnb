@@ -1,0 +1,21 @@
+.house-detail {
+    .header {
+        padding-top: 1vh;
+        padding-right: 5vw;
+        text-align: right;
+    }
+
+    .summary-info {
+        padding: 5vw;
+        .room-image {
+
+        }
+        
+        .info {
+            padding: 3vw;
+            .location {
+                font-weight: bold;
+            }
+        }
+    }
+}
