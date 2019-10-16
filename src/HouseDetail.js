@@ -17,8 +17,12 @@ let splitAmentities = (s) => {
     for (let word of words) {
         word = word.replace(/({|}|")/, "");
         if (/"/.test(word)) word = word.replace('"', '');
+        if (/translation missing/.test(word)) continue;
         results.push(word);
     }
+    let endWord = results[results.length - 1]
+    endWord = endWord.replace("}", "")
+    results[results.length - 1] = endWord
     return results;
 }
 
@@ -86,13 +90,6 @@ class HouseDetail extends React.Component {
         this.fetchData();
     }
 
-    // static getDerivedStateFromProps(nextProps, prevState) {
-    //     if (nextProps.someValue !== prevState.someValue) {
-    //         return { someState: nextProps.someValue };
-    //     }
-    //     else return null;
-    // }
-
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.match.params.id !== this.props.match.params.id) {
             this.fetchData()
@@ -134,7 +131,7 @@ class HouseDetail extends React.Component {
                         <p style={{ textAlign: "justify" }}>{house.description}</p>
                     </Row>
                     <Row style={{ padding: "2vw" }}>
-                        <h1>Amentities</h1>
+                        <h1>Amenities</h1>
                         {house.amenities && splitAmentities(house.amenities).map(word => {
                             return (<Col span={12} key={word}><Icon type="check" />&nbsp;{word}</Col>)
                         })}

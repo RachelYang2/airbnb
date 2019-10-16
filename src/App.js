@@ -35,7 +35,8 @@ class App extends React.Component {
     table0: [],
     table1: [],
     filtered: false,
-    user: localStorage.getItem('airbnb_user')
+    user: localStorage.getItem('airbnb_user'),
+    recommenderResult: []
   };
 
   menuRegion = (
@@ -88,14 +89,14 @@ class App extends React.Component {
 
   getFixedData = () => {
     let self = this
-    client.get('/hotlist').then(function(response) {
+    client.get('/hotlist').then(function (response) {
       self.setState({
         table0: response.data
       })
     }).catch(function (error) {
       console.log(error)
     })
-    client.get('/latest_booking').then(function(response) {
+    client.get('/latest_booking').then(function (response) {
       self.setState({
         table1: response.data
       })
@@ -106,7 +107,6 @@ class App extends React.Component {
 
   logout = () => {
     localStorage.removeItem('airbnb_user')
-    console.log('logout')
     this.setState({
       user: null
     })
@@ -132,6 +132,29 @@ class App extends React.Component {
       visible: false,
     });
   };
+
+  getRecommenderResult = (user) => {
+    let self = this
+    client.get('/recommender', {
+      params:
+      {
+        user_id: user,
+        recommender_way: "als"
+      }
+    })
+      .then(function (response) {
+        self.setState({
+          recommenderResult: response.data
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .finally(function () {
+        // always executed
+        window.scrollTo(0, 0)
+      });
+  }
 
   handleSubmit = e => {
     e.preventDefault();
@@ -183,11 +206,14 @@ class App extends React.Component {
 
   componentDidMount() {
     this.getFixedData();
+    if(localStorage.getItem("airbnb_user")) {
+      this.getRecommenderResult(localStorage.getItem("airbnb_user"))
+    }
   }
 
   render() {
     const { visible, confirmLoading, currentForm, locationContent, nopContent, priceContent,
-      table0, table1, filtered, filteredTable, user } = this.state;
+      table0, table1, filtered, filteredTable, user, recommenderResult } = this.state;
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="App">
@@ -273,6 +299,15 @@ class App extends React.Component {
           </div>
         </header>
         <div className="content">
+          {
+            user && recommenderResult && recommenderResult.length > 0 && !filtered &&
+            (
+              <div>
+                <h2>Inspired by Your Booking History</h2>
+                <HouseTable houses={recommenderResult}></HouseTable>
+              </div>
+            )
+          }
           {
             !filtered ? (
               <div>
