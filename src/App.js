@@ -10,7 +10,7 @@ const LOGIN = "Login";
 const menuContent = [
   {
     name: 'Location',
-    content: ["Central", "North", "East", "South"]
+    content: ["Central", "West", "North-East", "East", "North"]
   },
   {
     name: 'Number of Guests',
@@ -158,7 +158,6 @@ class App extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    let self = this
     this.props.form.validateFields((err, values) => {
       if (!err) {
         client.post('/login/', values).then(function (response) {
@@ -170,11 +169,12 @@ class App extends React.Component {
           }
           if (response.data === "ok") {
             localStorage.setItem("airbnb_user", values.username)
-            self.setState({
-              visible: false,
-              confirmLoading: false,
-              user: values.username
-            });
+            // self.setState({
+            //   visible: false,
+            //   confirmLoading: false,
+            //   user: values.username
+            // });
+            window.location.reload();
           }
         }).catch(function (error) {
           console.log(error)
@@ -218,20 +218,12 @@ class App extends React.Component {
 }
 
   resetFilter() {
-    this.getFixedData();
-    if (localStorage.getItem("airbnb_user")) {
-      this.getRecommenderResult(localStorage.getItem("airbnb_user"))
-    }
-    this.setState({
-      locationContent: menuContent[0].name,
-      nopContent: menuContent[1].name,
-      priceContent: menuContent[2].name,
-    })
+    window.location.reload()
   }
 
   render() {
     const { visible, confirmLoading, currentForm, locationContent, nopContent, priceContent,
-      table0, table1, filtered, filteredTable, user, recommenderResult } = this.state;
+      table0, table1, filtered, filteredTable, user, recommenderResult, locationFilter, nopFilter, priceFilter } = this.state;
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="App">
@@ -268,7 +260,7 @@ class App extends React.Component {
                     )}
                   </Form.Item>
                   <Form.Item>
-                    <Button type="primary" style={{ width: "100%" }} htmlType="submit" className="login-form-button">
+                    <Button type="primary" style={{ width: "100%", backgroundColor: "#FF5A5E", borderColor: "#FF5A5E"}} htmlType="submit" className="login-form-button">
                       {currentForm}
                     </Button>
                   </Form.Item>
@@ -313,7 +305,8 @@ class App extends React.Component {
               <Button type="primary" icon="search" onClick={this.fetchData} style={{ backgroundColor: "#FF5A5E", borderColor: "#FF5A5E" }}>
                 Search
               </Button>
-              {/* <span onClick={this.resetFilter}>Reset</span> */}
+              {(locationFilter !== 0 || nopFilter !== 0 || priceFilter !== 0) && <span onClick={this.resetFilter} 
+              style={{fontSize: "80%", fontWeight: "normal", marginLeft: "1vw", cursor: "pointer"}}>Reset</span>}
             </div>
           </div>
         </header>

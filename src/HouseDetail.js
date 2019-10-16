@@ -110,7 +110,7 @@ class HouseDetail extends React.Component {
                             <div className="info">
                                 <p className="location"><Icon type="environment" />&nbsp;{house.neighbourhood_cleansed}</p>
                                 <p>{house.name}</p>
-                                <p>{house.bedrooms}&nbsp;bedrooms&nbsp;&nbsp;{house.bathrooms}&nbsp;bathrooms</p>
+                                <p>{house.bedrooms && parseInt(house.bedrooms)}&nbsp;bedrooms&nbsp;&nbsp;{house.bathrooms && parseInt(house.bathrooms)}&nbsp;bathrooms</p>
                                 <p>&nbsp;{house.price}&nbsp;SGD/night </p>
                                 {house.review_scores_rating && <div>
                                     <span>{house.review_scores_rating && house.review_scores_rating / 20}&nbsp;&nbsp;</span>
