@@ -14,18 +14,18 @@ class HouseTable extends React.Component {
         return (
             <div>
                 <Row>
-                    {houses && houses.map(house => (
-                        <Col key={house.id} span={8}>
+                    {houses && houses.length > 0 && houses.map(house => (
+                        <Col key={house.listing_id} span={8}>
                             <div className="info-block" style={{ padding: "1vw" }}>
-                                <img src={house.picture_url} />
+                                <Link to={`/house/${house.listing_id}`}><img src={house.picture_url} /></Link>
                                 <div>
-                                    <p style={{ fontWeight: "bold" }}>{house.neighbourhood_group}&nbsp;Singapore</p>
+                                    <p style={{ fontWeight: "bold" }}>{house.neighbourhood_group_cleansed && house.neighbourhood_group_cleansed.split(' ')[0]}&nbsp;- Singapore</p>
                                     <p><Link to={`/house/${house.id}`}>{house.name}</Link></p>
-                                    <p>$&nbsp;{house.price}&nbsp;SGD/night </p>
+                                    <p>&nbsp;{house.price}&nbsp;SGD/night </p>
                                     <div>
                                         {house.review_score_rating && <StarRatings
                                             rating={house.review_score_rating / 20}
-                                            starRatedColor="blue"
+                                            starRatedColor="#4472C4"
                                             numberOfStars={5}
                                             starDimension="15px"
                                             name='rating'

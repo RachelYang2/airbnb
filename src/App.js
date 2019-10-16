@@ -1,75 +1,116 @@
 import React from 'react';
 import './App.scss';
+import _ from "lodash";
 import HouseTable from './HouseTable';
-import { Menu, Dropdown, Icon, Button, Form, Input, Modal } from 'antd';
+import { Menu, Dropdown, Icon, Button, Form, Input, Modal, message } from 'antd';
+const client = require('./client');
+
 
 const LOGIN = "Login";
-const REGISTER = "Register";
+const menuContent = [
+  {
+    name: 'Location',
+    content: ["Central", "North", "East", "South"]
+  },
+  {
+    name: 'Number of Guests',
+    content: ["1 to 3 People", "4 to 6 People", "7 to 10 People", "Over 10 People"]
+  },
+  {
+    name: "Price Range",
+    content: ["$0-$49", "$50-$99", "$100-$299", "$300-$500", "Over $500"]
+  }
+]
 class App extends React.Component {
   state = {
     visible: false,
     confirmLoading: false,
-    currentForm: ''
+    currentForm: '',
+    locationContent: menuContent[0].name,
+    nopContent: menuContent[1].name,
+    priceContent: menuContent[2].name,
+    locationFilter: 0,
+    nopFilter: 0,
+    priceFilter: 0,
+    table0: [],
+    table1: [],
+    filtered: false,
+    user: localStorage.getItem('airbnb_user')
   };
 
   menuRegion = (
-    <Menu onClick={this.handleMenuClick}>
-      <Menu.Item key="1">
-        Central
-      </Menu.Item>
-      <Menu.Item key="2">
-        North
-      </Menu.Item>
-      <Menu.Item key="3">
-        East
-      </Menu.Item>
-      <Menu.Item key="4">
-        South
-      </Menu.Item>
+    <Menu onClick={({ key }) => this.handleMenuClick(0, key)}>
+      {
+        _.map(menuContent[0].content, (menu, index) =>
+          (<Menu.Item key={index}>{menu}</Menu.Item>))
+      }
     </Menu>
   );
 
   menuNoP = (
-    <Menu onClick={this.handleMenuClick}>
-      <Menu.Item key="1">
-        1 to 3 People
-      </Menu.Item>
-      <Menu.Item key="2">
-        4 to 6 People
-      </Menu.Item>
-      <Menu.Item key="3">
-        7 to 10 People
-      </Menu.Item>
-      <Menu.Item key="4">
-        Over 10 People
-      </Menu.Item>
+    <Menu onClick={({ key }) => this.handleMenuClick(1, key)}>
+      {
+        _.map(menuContent[1].content, (menu, index) =>
+          (<Menu.Item key={index}>{menu}</Menu.Item>))
+      }
     </Menu>
   );
 
   menuPrice = (
-    <Menu onClick={this.handleMenuClick}>
-      <Menu.Item key="1">
-        $0-$49
-      </Menu.Item>
-      <Menu.Item key="2">
-        $50-$99
-      </Menu.Item>
-      <Menu.Item key="3">
-        $100-$299
-      </Menu.Item>
-      <Menu.Item key="4">
-        $300-$500
-      </Menu.Item>
-      <Menu.Item key="5">
-        Over $500
-      </Menu.Item>
+    <Menu onClick={({ key }) => this.handleMenuClick(2, key)}>
+      {
+        _.map(menuContent[2].content, (menu, index) =>
+          (<Menu.Item key={index}>{menu}</Menu.Item>))
+      }
     </Menu>
   );
 
-  handleMenuClick = (e) => {
-
+  handleMenuClick = (type, selection) => {
+    if (type === 0) {
+      this.setState({
+        locationContent: menuContent[0].content[selection],
+        locationFilter: selection
+      });
+    }
+    else if (type === 1) {
+      this.setState({
+        nopContent: menuContent[1].content[selection],
+        nopFilter: selection
+      });
+    }
+    else {
+      this.setState({
+        priceContent: menuContent[2].content[selection],
+        priceFilter: selection
+      });
+    }
   }
 
+  getFixedData = () => {
+    let self = this
+    client.get('/hotlist').then(function(response) {
+      self.setState({
+        table0: response.data
+      })
+    }).catch(function (error) {
+      console.log(error)
+    })
+    client.get('/latest_booking').then(function(response) {
+      self.setState({
+        table1: response.data
+      })
+    }).catch(function (error) {
+      console.log(error)
+    })
+  }
+
+  logout = () => {
+    localStorage.removeItem('airbnb_user')
+    console.log('logout')
+    this.setState({
+      user: null
+    })
+  }
 
   showModal = (type) => {
     this.setState({
@@ -83,12 +124,7 @@ class App extends React.Component {
       ModalText: 'The modal will be closed after two seconds',
       confirmLoading: true,
     });
-    setTimeout(() => {
-      this.setState({
-        visible: false,
-        confirmLoading: false,
-      });
-    }, 2000);
+
   };
 
   handleCancel = () => {
@@ -99,15 +135,59 @@ class App extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault();
+    let self = this
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
+        client.post('/login/', values).then(function (response) {
+          if (response.data === "fail_user") {
+            message.error("Invalid user")
+          }
+          if (response.data === "fail_password") {
+            message.error("Wrong password")
+          }
+          if (response.data === "ok") {
+            localStorage.setItem("airbnb_user", values.username)
+            self.setState({
+              visible: false,
+              confirmLoading: false,
+              user: values.username
+            });
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
       }
     });
   };
 
+  fetchData = () => {
+    const { locationFilter, nopFilter, priceFilter } = this.state;
+    if (locationFilter === 0 && nopFilter === 0 && priceFilter === 0)
+      return;
+    let self = this;
+    client.post('/filter/', {
+      filter1: (parseInt(locationFilter) + 1).toString(),
+      filter2: (parseInt(nopFilter) + 1).toString(),
+      filter3: (parseInt(priceFilter) + 1).toString()
+    })
+      .then(function (response) {
+        self.setState({
+          filtered: true,
+          filteredTable: response.data
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  componentDidMount() {
+    this.getFixedData();
+  }
+
   render() {
-    const { visible, confirmLoading, currentForm } = this.state;
+    const { visible, confirmLoading, currentForm, locationContent, nopContent, priceContent,
+      table0, table1, filtered, filteredTable, user } = this.state;
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="App">
@@ -151,52 +231,69 @@ class App extends React.Component {
                 </Form>
               </Modal>
             </div>
-            <Button
+            {!user ? <Button
               type="link"
               id="App-link"
               onClick={() => this.showModal(LOGIN)}
             >
               Login
-            </Button>
-            <Button
-              type="link"
-              id="App-link"
-              onClick={() => this.showModal(REGISTER)}
-            >
-              Register
-            </Button>
+            </Button> :
+              <div>
+                <span>Hi {user}!</span>
+                <Button
+                  type="link"
+                  id="App-link"
+                  onClick={this.logout}
+                >
+                  Logout
+              </Button>
+              </div>
+            }
           </div>
           <div className="filters">
             <div id="components-dropdown-demo-dropdown-button">
               <Dropdown overlay={this.menuRegion} placement="bottomRight">
                 <Button>
-                  Location&nbsp;<Icon type="environment" />
+                  {locationContent}&nbsp;<Icon type="environment" />
                 </Button>
               </Dropdown>
               <Dropdown overlay={this.menuNoP} placement="bottomRight">
-                <Button>Number of Guests&nbsp;<Icon type="user" />
+                <Button>{nopContent}&nbsp;<Icon type="user" />
                 </Button>
               </Dropdown>
               <Dropdown overlay={this.menuPrice} placement="bottomRight">
                 <Button>
-                  Price Range<Icon type="dollar" />
+                  {priceContent}<Icon type="dollar" />
                 </Button>
               </Dropdown>
-              <Button type="primary" icon="search">
+              <Button type="primary" icon="search" onClick={this.fetchData} style={{ backgroundColor: "#FF5A5E", borderColor: "#FF5A5E" }}>
                 Search
               </Button>
             </div>
           </div>
         </header>
         <div className="content">
-          <div className="just-booked">
-            <h2>Just Booked in Singapore</h2>
-            <HouseTable></HouseTable>
-          </div>
-          <div className="hot-accommodation">
-            <h2>Hot Accommodation in Singapore</h2>
-            <HouseTable></HouseTable>
-          </div>
+          {
+            !filtered ? (
+              <div>
+                <div className="just-booked">
+                  <h2>Just Booked in Singapore</h2>
+                  <HouseTable houses={table0}></HouseTable>
+                </div>
+                <br></br>
+                <div className="hot-accommodation">
+                  <h2>Hot Accommodation in Singapore</h2>
+                  <HouseTable houses={table1}></HouseTable>
+                </div>
+              </div>
+            ) :
+              (
+                <div>
+                  <HouseTable houses={filteredTable}></HouseTable>
+                </div>
+              )
+          }
+
         </div>
       </div>)
   }

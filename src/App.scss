@@ -24,6 +24,12 @@
 
   .filters {
     margin-top: 25vh;
+    font-weight: bold;
+    
+    .ant-dropdown-trigger {
+      width: 20vw;
+      font-weight: bold;
+    }
   }
 
   #components-dropdown-demo-dropdown-button .ant-dropdown-button {
