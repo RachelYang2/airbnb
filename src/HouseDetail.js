@@ -115,10 +115,10 @@ class HouseDetail extends React.Component {
                                 <p>{house.name}</p>
                                 <p>{house.bedrooms}&nbsp;bedrooms&nbsp;&nbsp;{house.bathrooms}&nbsp;bathrooms</p>
                                 <p>&nbsp;{house.price}&nbsp;SGD/night </p>
-                                <p>{house.review_score_rating && house.review_score_rating / 20}</p>
-                                {house.review_score_rating && <div>
+                                <p>{house.review_scores_rating && house.review_scores_rating / 20}</p>
+                                {house.review_scores_rating && <div>
                                     <StarRatings
-                                        rating={house.review_score_rating / 20}
+                                        rating={house.review_scores_rating / 20}
                                         starRatedColor="#4472C4"
                                         numberOfStars={5}
                                         starDimension="15px"

@@ -23,8 +23,8 @@ class HouseTable extends React.Component {
                                     <p><Link to={`/house/${house.id}`}>{house.name}</Link></p>
                                     <p>&nbsp;{house.price}&nbsp;SGD/night </p>
                                     <div>
-                                        {house.review_score_rating && <StarRatings
-                                            rating={house.review_score_rating / 20}
+                                        {house.review_scores_rating && <StarRatings
+                                            rating={house.review_scores_rating / 20}
                                             starRatedColor="#4472C4"
                                             numberOfStars={5}
                                             starDimension="15px"
