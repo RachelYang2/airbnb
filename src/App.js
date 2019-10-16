@@ -206,9 +206,27 @@ class App extends React.Component {
 
   componentDidMount() {
     this.getFixedData();
-    if(localStorage.getItem("airbnb_user")) {
+    if (localStorage.getItem("airbnb_user")) {
       this.getRecommenderResult(localStorage.getItem("airbnb_user"))
     }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.user !== this.state.user && this.state.user != null) {
+        this.getRecommenderResult(this.state.user)
+    }
+}
+
+  resetFilter() {
+    this.getFixedData();
+    if (localStorage.getItem("airbnb_user")) {
+      this.getRecommenderResult(localStorage.getItem("airbnb_user"))
+    }
+    this.setState({
+      locationContent: menuContent[0].name,
+      nopContent: menuContent[1].name,
+      priceContent: menuContent[2].name,
+    })
   }
 
   render() {
@@ -295,6 +313,7 @@ class App extends React.Component {
               <Button type="primary" icon="search" onClick={this.fetchData} style={{ backgroundColor: "#FF5A5E", borderColor: "#FF5A5E" }}>
                 Search
               </Button>
+              {/* <span onClick={this.resetFilter}>Reset</span> */}
             </div>
           </div>
         </header>

@@ -9,6 +9,7 @@
 .App-header {
   background: url('images/background.png') no-repeat;
   background-position-y: bottom;
+  background-size: cover;
   min-height: 50vh;
   display: flex;
   flex-direction: column;
