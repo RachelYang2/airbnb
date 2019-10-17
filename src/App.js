@@ -286,6 +286,9 @@ class App extends React.Component {
               </div>
             }
           </div>
+          <div>
+            <h1 className="slogan">Live Like a Local</h1>
+          </div>
           <div className="filters">
             <div id="components-dropdown-demo-dropdown-button">
               <Dropdown overlay={this.menuRegion} placement="bottomRight">
