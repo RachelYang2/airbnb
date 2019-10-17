@@ -2,6 +2,7 @@ import React from 'react';
 import './App.scss';
 import _ from "lodash";
 import HouseTable from './HouseTable';
+import Footer from './footer';
 import { Menu, Dropdown, Icon, Button, Form, Input, Modal, message } from 'antd';
 const client = require('./client');
 
@@ -345,6 +346,7 @@ class App extends React.Component {
           }
 
         </div>
+        <Footer />
       </div>)
   }
 }

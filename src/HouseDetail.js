@@ -4,6 +4,7 @@ import { Row, Col, Icon } from 'antd';
 import StarRatings from 'react-star-ratings';
 import HouseTable from './HouseTable';
 import { Link } from 'react-router-dom'
+import Footer from './footer';
 
 const client = require('./client');
 
@@ -99,52 +100,55 @@ class HouseDetail extends React.Component {
     render() {
         const { house, recommenderGroup1, recommenderGroup2 } = this.state;
         return (
-            <div className="house-detail">
-                <div style={{ margin: "2vw" }}><Link to="/"><Icon type="arrow-left" />&nbsp;Back</Link>
-                    <span className="header">Hi {localStorage.getItem("airbnb_user")}</span>
+            <div>
+                <div className="house-detail">
+                    <div style={{ margin: "2vw" }}><Link to="/" title="Back to Index">&nbsp;&nbsp;<Icon type="home" style={{ fontSize: '20px', color: '#FF5A5E' }} /></Link>
+                        <span className="header">Hi {localStorage.getItem("airbnb_user")}</span>
+                    </div>
+                    <div className="summary-info">
+                        <Row style={{ padding: "2vw" }}>
+                            <Col span={12}><img src={house.picture_url} style={{ width: "95%", height: "95%" }} /></Col>
+                            <Col span={12}>
+                                <div className="info">
+                                    <p className="location"><Icon type="environment" />&nbsp;{house.neighbourhood_cleansed}</p>
+                                    <p>{house.name}</p>
+                                    <p>{house.bedrooms && parseInt(house.bedrooms)}&nbsp;bedrooms&nbsp;&nbsp;{house.bathrooms && parseInt(house.bathrooms)}&nbsp;bathrooms</p>
+                                    <p>&nbsp;{house.price}&nbsp;SGD/night </p>
+                                    {house.review_scores_rating && <div>
+                                        <span>{house.review_scores_rating && house.review_scores_rating / 20}&nbsp;&nbsp;</span>
+                                        <StarRatings
+                                            rating={house.review_scores_rating / 20}
+                                            starRatedColor="#4472C4"
+                                            numberOfStars={5}
+                                            starDimension="15px"
+                                            name='rating'
+                                            starSpacing="3px"
+                                        />
+                                    </div>}
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row style={{ padding: "2vw" }}>
+                            <h1>Description</h1>
+                            <p style={{ textAlign: "justify" }}>{house.description}</p>
+                        </Row>
+                        <Row style={{ padding: "2vw" }}>
+                            <h1>Amenities</h1>
+                            {house.amenities && splitAmentities(house.amenities).map(word => {
+                                return (<Col span={12} key={word}><Icon type="check" />&nbsp;{word}</Col>)
+                            })}
+                        </Row>
+                        <Row style={{ padding: "2vw" }}>
+                            <h1>Similar Accommodations</h1>
+                            <HouseTable houses={recommenderGroup1}></HouseTable>
+                        </Row>
+                        <Row style={{ padding: "2vw" }}>
+                            <h1>Guess you will like......</h1>
+                            <HouseTable houses={recommenderGroup2}></HouseTable>
+                        </Row>
+                    </div>
                 </div>
-                <div className="summary-info">
-                    <Row style={{ padding: "2vw" }}>
-                        <Col span={12}><img src={house.picture_url} style={{ width: "95%", height: "95%" }} /></Col>
-                        <Col span={12}>
-                            <div className="info">
-                                <p className="location"><Icon type="environment" />&nbsp;{house.neighbourhood_cleansed}</p>
-                                <p>{house.name}</p>
-                                <p>{house.bedrooms && parseInt(house.bedrooms)}&nbsp;bedrooms&nbsp;&nbsp;{house.bathrooms && parseInt(house.bathrooms)}&nbsp;bathrooms</p>
-                                <p>&nbsp;{house.price}&nbsp;SGD/night </p>
-                                {house.review_scores_rating && <div>
-                                    <span>{house.review_scores_rating && house.review_scores_rating / 20}&nbsp;&nbsp;</span>
-                                    <StarRatings
-                                        rating={house.review_scores_rating / 20}
-                                        starRatedColor="#4472C4"
-                                        numberOfStars={5}
-                                        starDimension="15px"
-                                        name='rating'
-                                        starSpacing="3px"
-                                    />
-                                </div>}
-                            </div>
-                        </Col>
-                    </Row>
-                    <Row style={{ padding: "2vw" }}>
-                        <h1>Description</h1>
-                        <p style={{ textAlign: "justify" }}>{house.description}</p>
-                    </Row>
-                    <Row style={{ padding: "2vw" }}>
-                        <h1>Amenities</h1>
-                        {house.amenities && splitAmentities(house.amenities).map(word => {
-                            return (<Col span={12} key={word}><Icon type="check" />&nbsp;{word}</Col>)
-                        })}
-                    </Row>
-                    <Row style={{ padding: "2vw" }}>
-                        <h1>Similar Accommodations</h1>
-                        <HouseTable houses={recommenderGroup1}></HouseTable>
-                    </Row>
-                    <Row style={{ padding: "2vw" }}>
-                        <h1>Guess you will like......</h1>
-                        <HouseTable houses={recommenderGroup2}></HouseTable>
-                    </Row>
-                </div>
+                <Footer />
             </div>
         )
     }
